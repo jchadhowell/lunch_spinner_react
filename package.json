@@ -1,7 +1,7 @@
 {
   "name": "lunch_spinner_react",
   "engines": {
-    "node":">=8.8.0"
+    "node": ">=8.8.0"
   },
   "version": "0.1.0",
   "private": true,

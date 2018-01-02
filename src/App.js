@@ -2,15 +2,6 @@ import React, { Component } from 'react';
 import './App.css';
 
 const defaultImage = 'https://raw.githubusercontent.com/jchadhowell/LunchSpinner/master/public/images/lunch.jpeg';
-const images = [
-  'https://media.cntraveler.com/photos/599374c130e0b978de5929d7/master/w_775,c_limit/Ithaa-Undersea-Restaurant.jpg',
-  'https://santabarbaraca.com/content/uploads/2015/08/restaurants-santa-barbara.jpg',
-  'https://media.cntraveler.com/photos/589a20129b67416638b3bf3a/master/pass/best-restaurants-london-dinner-2017.jpg',
-  'https://now-here-this.timeout.com/wp-content/uploads/2014/03/7138287747_6fefd52f74_b-528x352.jpg'
-
-
-]
-
 
 const buttonDisplay = 'Give it a Spin!';
 
@@ -19,13 +10,17 @@ class App extends Component {
     super(props);
     this.state = {
       image: defaultImage,
+      restaurants: [],
     }
   }
 
   onClick() {
-    let index = Math.floor( Math.random() * (3));
+
+    let index = Math.floor(Math.random() * (3));
+    console.log("restaurants: " + this.state.restaurants);
     this.setState({
-      image: images[index],
+      image: this.state.restaurants[index].image_url,
+
     })
   }
 
@@ -41,6 +36,20 @@ class App extends Component {
       </div>
     );
   }
+
+  componentDidMount() {
+    let restaurantsFetched = [];
+    fetch('http://spinnerapi-env.syswtxnkfe.us-west-2.elasticbeanstalk.com/restaurants',
+    )
+      .then((result) => {
+        return result.json();
+      }).then((jsonResult) => {
+        console.log("restaurants fetched: " + jsonResult);
+        restaurantsFetched = jsonResult;
+      })
+      this.setState({restaurants:restaurantsFetched})
+  }
+
 }
 
 function Restaurant(props) {
