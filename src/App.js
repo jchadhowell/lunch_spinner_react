@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import Demo from './Geolocation';
 
 const defaultImage = 'https://raw.githubusercontent.com/jchadhowell/LunchSpinner/master/public/images/lunch.jpeg';
 
@@ -46,6 +47,7 @@ class App extends Component {
         <Spinner
           display={buttonDisplay}
           onClick={() => this.onClick()} />
+          <Demo/>
       </div>
     );
   }
@@ -80,5 +82,8 @@ function Spinner(props) {
     <button onClick={props.onClick} >{props.display}</button>
   </div>
 }
+
+
+
 
 export default App;
