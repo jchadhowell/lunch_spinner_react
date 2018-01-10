@@ -2,7 +2,18 @@ import React, { Component } from 'react';
 import './App.css';
 import Demo from './Geolocation';
 
+var NodeGeocoder = require('node-geocoder');
+
+var options = {
+  provider: 'google',
+};
+
+var geocoder = NodeGeocoder(options);
+
+
 const defaultImage = 'https://raw.githubusercontent.com/jchadhowell/LunchSpinner/master/public/images/lunch.jpeg';
+
+const DEFAULT_ZIP_CODE = '78665';
 
 const buttonDisplay = 'Give it a Spin!';
 
@@ -47,19 +58,66 @@ class App extends Component {
         <Spinner
           display={buttonDisplay}
           onClick={() => this.onClick()} />
-          <Demo/>
+        <Demo />
       </div>
     );
   }
 
   componentDidMount() {
-    fetch('http://spinnerapi-env.syswtxnkfe.us-west-2.elasticbeanstalk.com/restaurants',
-    )
-      .then((result) => {
-        return result.json();
-      }).then((jsonResult) => {
-        this.setState({ restaurants: jsonResult })
-      })
+
+    var that = this;
+
+    function getZipCode(res) {
+      if (res && res.length && res[0].zipcode) {
+        return res[0].zipcode;
+      }
+      return null;
+    }
+
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        console.log('L ' + latitude);
+        console.log('L' + longitude);
+
+        if (latitude && longitude) {
+
+          // geocoder.reverse({lat:45.767, lon:4.833}, function(err, res) {
+          //   console.log(res);
+          // });
+
+          geocoder.reverse({lat:latitude, lon:longitude}, function (geocoderError, geocoderResponse) {
+            console.log(geocoderError);
+            console.log(geocoderResponse);
+            var zipCode = getZipCode(geocoderResponse) || DEFAULT_ZIP_CODE;
+            fetch('http://spinnerapi-env.syswtxnkfe.us-west-2.elasticbeanstalk.com/restaurants/' + zipCode,
+            )
+              .then((result) => {
+                return result.json();
+              }).then((jsonResult) => {
+                that.setState({ restaurants: jsonResult })
+              })
+          });
+
+        } else {
+
+          console.log("no lattitude or longitude");
+        }
+
+      }, function (error) {
+        console.log(error);
+      }, { timeout: 10000 });
+    }
+
+
+
+
+
+
   }
 }
 
@@ -67,7 +125,7 @@ function Restaurant(props) {
   return (
     <div>
       <img src={props.image} alt='restaurant' />
-      <div style={{textAlign:'center'}}>{props.name}</div>
+      <div style={{ textAlign: 'center' }}>{props.name}</div>
     </div>
   )
 }
