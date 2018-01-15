@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import Demo from './Geolocation';
 
 var NodeGeocoder = require('node-geocoder');
 
@@ -9,7 +8,6 @@ var options = {
 };
 
 var geocoder = NodeGeocoder(options);
-
 
 const defaultImage = 'https://raw.githubusercontent.com/jchadhowell/LunchSpinner/master/public/images/lunch.jpeg';
 
@@ -23,6 +21,7 @@ class App extends Component {
     this.state = {
       image: defaultImage,
       restaurants: [],
+      city: "Your City"
     }
   }
 
@@ -51,14 +50,14 @@ class App extends Component {
 
 
       <div style={divStyle} >
-        <h1 style={{ textAlign: 'center' }} >What's For Lunch?</h1>
+        <h1 style={{ textAlign: 'center' }} >What's For Lunch in {this.state.city}?</h1>
         <Restaurant
-          image={this.state.image}
+          image={this.state.image} 
           name={this.state.name} />
         <Spinner
           display={buttonDisplay}
           onClick={() => this.onClick()} />
-        <Demo />
+        
       </div>
     );
   }
@@ -81,18 +80,12 @@ class App extends Component {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
 
-        console.log('L ' + latitude);
-        console.log('L' + longitude);
-
         if (latitude && longitude) {
-
-          // geocoder.reverse({lat:45.767, lon:4.833}, function(err, res) {
-          //   console.log(res);
-          // });
 
           geocoder.reverse({lat:latitude, lon:longitude}, function (geocoderError, geocoderResponse) {
             console.log(geocoderError);
-            console.log(geocoderResponse);
+            console.log(geocoderResponse[0].city);
+            that.setState({city:geocoderResponse[0].city});
             var zipCode = getZipCode(geocoderResponse) || DEFAULT_ZIP_CODE;
             fetch('http://spinnerapi-env.syswtxnkfe.us-west-2.elasticbeanstalk.com/restaurants/' + zipCode,
             )
@@ -112,12 +105,6 @@ class App extends Component {
         console.log(error);
       }, { timeout: 10000 });
     }
-
-
-
-
-
-
   }
 }
 
