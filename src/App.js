@@ -52,12 +52,12 @@ class App extends Component {
       <div style={divStyle} >
         <h1 style={{ textAlign: 'center' }} >What's For Lunch in {this.state.city}?</h1>
         <Restaurant
-          image={this.state.image} 
+          image={this.state.image}
           name={this.state.name} />
         <Spinner
           display={buttonDisplay}
           onClick={() => this.onClick()} />
-        
+
       </div>
     );
   }
@@ -74,6 +74,37 @@ class App extends Component {
     }
 
 
+
+    function logResult(result) {
+      console.log(result);
+      that.setState({ restaurants: result });
+    }
+
+    function logError(error) {
+      console.log('Looks like there was a problem: \n', error);
+    }
+
+    function validateResponse(response) {
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      return response;
+    }
+
+    function readResponseAsJSON(response) {
+      console.log(response);
+      return response.json();
+    }
+
+    function fetchJSON(pathToResource) {
+      fetch(pathToResource)
+        .then(validateResponse)
+        .then(readResponseAsJSON)
+        .then(logResult)
+        .catch(logError);
+    }
+
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(function (position) {
 
@@ -82,25 +113,16 @@ class App extends Component {
 
         if (latitude && longitude) {
 
-          geocoder.reverse({lat:latitude, lon:longitude}, function (geocoderError, geocoderResponse) {
-            console.log(geocoderError);
-            console.log(geocoderResponse[0].city);
-            that.setState({city:geocoderResponse[0].city});
+          geocoder.reverse({ lat: latitude, lon: longitude }, function (geocoderError, geocoderResponse) {
+            that.setState({ city: geocoderResponse[0].city });
             var zipCode = getZipCode(geocoderResponse) || DEFAULT_ZIP_CODE;
-            fetch('http://spinnerapi-env.syswtxnkfe.us-west-2.elasticbeanstalk.com/restaurants/' + zipCode,
-            )
-              .then((result) => {
-                return result.json();
-              }).then((jsonResult) => {
-                that.setState({ restaurants: jsonResult })
-              })
+
+            fetchJSON("https://api.lunch-spinner.com/restaurants/" + zipCode);
           });
 
         } else {
-
           console.log("no lattitude or longitude");
         }
-
       }, function (error) {
         console.log(error);
       }, { timeout: 10000 });
