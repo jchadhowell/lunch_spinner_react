@@ -31,6 +31,7 @@ class App extends Component {
     this.setState({
       image: this.state.restaurants[index].image_url,
       name: this.state.restaurants[index].name,
+      url: this.state.restaurants[index].mobile_url,
 
     })
   }
@@ -53,7 +54,8 @@ class App extends Component {
         <h1 style={{ textAlign: 'center' }} >What's For Lunch in {this.state.city}?</h1>
         <Restaurant
           image={this.state.image}
-          name={this.state.name} />
+          name={this.state.name}
+          url={this.state.url} />
         <Spinner
           display={buttonDisplay}
           onClick={() => this.onClick()} />
@@ -133,8 +135,9 @@ class App extends Component {
 function Restaurant(props) {
   return (
     <div>
-      <img src={props.image} alt='restaurant' />
-      <div style={{ textAlign: 'center' }}>{props.name}</div>
+      <a href={props.url}>
+        <img src={props.image} alt="restaurant" />
+      </a>
     </div>
   )
 }
