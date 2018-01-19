@@ -135,9 +135,11 @@ class App extends Component {
 function Restaurant(props) {
   return (
     <div>
+
       <a href={props.url}>
         <img src={props.image} alt="restaurant" />
       </a>
+      <div style={{ textAlign: 'center' }}>{props.name}</div>
     </div>
   )
 }
